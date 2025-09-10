@@ -6,27 +6,38 @@ jobs:
   sast_scan:
     name: Run Bandit Scam
     runs-on: ubuntu-latest
-
-
     steps:
     - name: checkout code
       uses: actions/checkout@v2
-
     - name: Set up python
       uses: actions/setup-python@v2
       with: 
         python-version: 3.8
-
     - name: Install bandit
       run: pip install bandit
-
     - name: Run Bandit Scan
       run: bandit -ll -ii -r . -f json -o bandit-report.json
-
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       if: always()
       with: 
         name: bandit-findings
         path: bandit-report.json
-        
+
+  image_scan:
+    name: Run Image scan and Run image Scan
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout code
+      uses: actions/checkout@v2
+    - name: Setup Docker
+      uses: docker-practice/actions-setup-docker@v1
+      with:
+       docker_version: '20.10.7'
+    - name: Build Docker image
+      run: docker build -f Dockerfile -t myapp:latest .
+    - name: Run Docker Scout to scan quickview
+      uses: docker/scout-action@f8c776824083494ab0d56b8105ba2ca85c86e4de
+      with:
+        command: quickview,cves
+        image: myapp:latest
