@@ -45,8 +45,8 @@ jobs:
       - name: Run Docker Scout (Quickview + CVEs)
         uses: docker/scout-action@v1.18.2
         with:
-          dockerhub-user: ${{ secrets.DOCKER_PASSWORD }}
-          dockerhub-password: ${{ secrets.DOCKER_USERNAME }}
+          dockerhub-user: ${{ secrets.DOCKER_USERNAME }}
+          dockerhub-password: ${{ secrets.DOCKER_PASSWORD }}
           only-severities: critical,high
           sarif-file: scout.sarif
           command: quickview,cves
