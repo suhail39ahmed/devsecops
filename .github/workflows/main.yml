@@ -42,11 +42,19 @@ jobs:
       - name: Build Docker image
         run: docker build -f Dockerfile -t myapp:latest .
 
-      - name: Docker Login
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-
       - name: Run Docker Scout (Quickview + CVEs)
         uses: docker/scout-action@v1.18.2
         with:
+          dockerhub-user: ${{ secrets.DOCKER_PASSWORD }}
+          dockerhub-password: ${{ secrets.DOCKER_USERNAME }}
+          only-severities: critical,high
+          sarif-file: scout.sarif
           command: quickview,cves
           image: myapp:latest
+
+      - name: Upload docker Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scout-findings
+          path: scout.sarif
